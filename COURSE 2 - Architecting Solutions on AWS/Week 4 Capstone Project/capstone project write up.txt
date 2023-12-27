@@ -1,0 +1,13 @@
+The purpose of the Blog Page Application is to launch a Django-based web application on the AWS Cloud Infrastructure. This infrastructure consists of various key components:
+
+    Web Application: The web application operates on Elastic Compute Cloud (EC2) instances within an Auto Scaling Group, ensuring robust availability and scalability to accommodate fluctuations in user traffic.
+
+    Load Balancing: To evenly distribute incoming traffic and enhance fault tolerance, an Application Load Balancer is employed, guaranteeing a balanced workload distribution.
+
+    Database: For efficient database management, the application relies on the Relational Database Service (RDS), which offers a scalable and well-managed database solution.
+
+    Content Delivery and DNS: To optimize content delivery and manage domain name system (DNS) routing, CloudFront and Route 53 services are employed. CloudFront enables content caching and accelerates content distribution to users, while Route 53 ensures secure and dependable access to the application.
+
+    Media Storage: Users have the ability to upload images and videos to their blog pages, with these multimedia assets being securely stored in an Amazon S3 bucket.
+
+In conclusion, the Blog Page Application is securely hosted on AWS, leveraging a highly available, scalable, and robust infrastructure that includes EC2 instances, an Application Load Balancer, RDS for database management, CloudFront for content delivery, Route 53 for DNS management, and Amazon S3 for media storage.

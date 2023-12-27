@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Exercise 5: Storage</title>
+  <script src="scripts/clipboard.min.js"></script>
+  <script src="scripts/copybutton.js"></script>
+
+<style>
+    html, body, footer {
+        font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+        margin: 1em;
+    }
+
+    img:not(.clipboard){
+        max-width: 100%;
+        height: auto;
+        width: auto;
+    }
+
+    /* Copy buttons */
+    button.copybtn {
+        webkit-transition: opacity .3s ease-in-out;
+        -o-transition: opacity .3s ease-in-out;
+        transition: opacity .3s ease-in-out;
+        opacity: 0;
+        padding: 2px 6px;
+        position: absolute;
+        right: 4px;
+        top: 4px;
+    }
+    div.sourceCode:hover .copybtn, div.sourceCode .copybtn:focus {
+        opacity: .3;
+    }
+    div.sourceCode .copybtn:hover {
+        opacity: 1;
+    }
+    div.sourceCode {
+        position: relative;
+    }
+    .xmodule_display.xmodule_HtmlBlock ol {
+        padding: 0 0 0 2em !important;
+    }
+    .xmodule_display.xmodule_HtmlBlock ul {
+        padding: 0 0 0 2em !important;
+    }
+
+    code {
+        padding: 2px 4px !important;
+        background-color: #eee !important;
+        border-radius: 4px;
+    }
+    pre code {
+        padding: 9.5px !important;
+        background-color: #f5f5f5 !important;
+        display: block;
+        overflow-x: auto;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        word-break: break-all;
+        word-wrap: break-word;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        white-space: pre;
+    }
+    pre code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    pre code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    pre code span.at { color: #7d9029; } /* Attribute */
+    pre code span.bn { color: #40a070; } /* BaseN */
+    pre code span.bu { color: #06287e; } /* BuiltIn */
+    pre code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    pre code span.ch { color: #4070a0; } /* Char */
+    pre code span.cn { color: #880000; } /* Constant */
+    pre code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    pre code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    pre code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    pre code span.dt { color: #902000; } /* DataType */
+    pre code span.dv { color: #40a070; } /* DecVal */
+    pre code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    pre code span.ex { color: #06287e; } /* Extension */
+    pre code span.fl { color: #40a070; } /* Float */
+    pre code span.fu { color: #06287e; } /* Function */
+    pre code span.im { } /* Import */
+    pre code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    pre code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    pre code span.op { color: #666666; } /* Operator */
+    pre code span.ot { color: #007020; } /* Other */
+    pre code span.pp { color: #bc7a00; } /* Preprocessor */
+    pre code span.sc { color: #4070a0; } /* SpecialChar */
+    pre code span.ss { color: #bb6688; } /* SpecialString */
+    pre code span.st { color: #4070a0; } /* String */
+    pre code span.va { color: #19177c; } /* Variable */
+    pre code span.vs { color: #4070a0; } /* VerbatimString */
+    pre code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+    footer {
+        padding-top: 3em;
+        font-style: italic;
+        font-size: .9em;
+    }
+</style>
+<body>
+<p><em>[version_1.1]</em></p>
+<div style="background-color: #FFD2D2; padding: 15px; margin-bottom: 25px">
+<h3>
+<span class="fa fa-info-circle"></span> Note
+</h3>
+<p>The exercises in this course will have an associated charge in your AWS account. In this exercise, you create or use the following resources:</p>
+<ul>
+<li>AWS Identity and Access Management (IAM) policy and user (policies and users are AWS account features, offered at no additional charge)</li>
+<li>Amazon Elastic Compute Cloud (Amazon EC2) instance</li>
+<li>Amazon Simple Storage Service (Amazon S3) bucket</li>
+</ul>
+<p>Familiarize yourself with <strong><a href="https://aws.amazon.com/ec2/pricing/" target="_blank">Amazon EC2 pricing</a></strong>, <strong><a href="https://aws.amazon.com/s3/pricing/" target="_blank">Amazon S3 pricing</a></strong>, and the <strong><a href="https://aws.amazon.com/free/" target="_blank">AWS Free Tier</a></strong>.</p>
+</div>
+<h1 id="exercise-5-creating-an-s3-bucket-and-modifying-the-ec2-instance">Exercise 5: Creating an S3 Bucket and Modifying the EC2 Instance</h1>
+<p>For this scenario, you create the S3 bucket where the employee photos will be stored.</p>
+<p>In this exercise, you create the S3 bucket, upload an object to it, and modify the bucket policy. You also launch an EC2 instance with updated user data so that the application uses the S3 bucket. Finally, you stop the EC2 instance to prevent future costs.</p>
+<h2 id="task-1-creating-an-s3-bucket">Task 1: Creating an S3 bucket</h2>
+<p>In this task, you will create an S3 bucket.</p>
+<ol type="1">
+<li><p>If needed, log in to the AWS Management Console with your <em>Admin</em> user.</p></li>
+<li><p>In the search box, enter <code>S3</code> and open the Amazon S3 console by choosing <strong>S3</strong>.</p></li>
+<li><p>Choose <strong>Create bucket</strong>.</p></li>
+<li><p>For <strong>Bucket name</strong>, enter <code>employee-photo-bucket-&lt;your initials&gt;-&lt;unique number&gt;</code>.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">employee-photo-bucket-al-907</span></a></code></pre></div></li>
+<li><p>Choose <strong>Create bucket</strong>.</p></li>
+</ol>
+<h2 id="task-2-uploading-a-photo">Task 2: Uploading a photo</h2>
+<p>In this task, you will upload an object (a photo) to the S3 bucket.</p>
+<ol type="1">
+<li><p>Open the details of your newly created bucket by choosing the bucket name.</p></li>
+<li><p>Choose <strong>Upload</strong>.</p></li>
+<li><p>Choose <strong>Add files</strong>.</p></li>
+<li><p>Choose a photo of your choice from your computer and choose <strong>Open</strong>.</p></li>
+<li><p>Choose <strong>Upload.</strong></p>
+<p>At the top, you should see <em>Upload succeeded</em> in green.</p></li>
+<li><p>Choose <strong>Close</strong>.</p></li>
+</ol>
+<h2 id="task-3-modifying-the-s3-bucket-policy">Task 3: Modifying the S3 bucket policy</h2>
+<p>In this task, you will update the bucket policy. The updated configuration allows the IAM role that you created previously to access the bucket.</p>
+<ol type="1">
+<li><p>Choose the <strong>Permissions</strong> tab.</p></li>
+<li><p>Scroll down to <strong>Bucket policy</strong> and choose <strong>Edit</strong>.</p></li>
+<li><p>In the box, paste the following policy:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb2-2" title="2">    <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-3" title="3">    <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb2-4" title="4">        <span class="fu">{</span></a>
+<a class="sourceLine" id="cb2-5" title="5">            <span class="dt">&quot;Sid&quot;</span><span class="fu">:</span> <span class="st">&quot;AllowS3ReadAccess&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-6" title="6">            <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-7" title="7">            <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb2-8" title="8">                <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:iam::&lt;INSERT-ACCOUNT-NUMBER&gt;:role/S3DynamoDBFullAccessRole&quot;</span></a>
+<a class="sourceLine" id="cb2-9" title="9">            <span class="fu">},</span></a>
+<a class="sourceLine" id="cb2-10" title="10">            <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;s3:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-11" title="11">            <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb2-12" title="12">                <span class="st">&quot;arn:aws:s3:::&lt;INSERT-BUCKET-NAME&gt;&quot;</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb2-13" title="13">                <span class="st">&quot;arn:aws:s3:::&lt;INSERT-BUCKET-NAME&gt;/*&quot;</span></a>
+<a class="sourceLine" id="cb2-14" title="14">            <span class="ot">]</span></a>
+<a class="sourceLine" id="cb2-15" title="15">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb2-16" title="16">    <span class="ot">]</span></a>
+<a class="sourceLine" id="cb2-17" title="17"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Replace the <code>&lt;INSERT-ACCOUNT-NUMBER&gt;</code> placeholder with your account number.</p></li>
+<li><p>Replace the <code>&lt;INSERT-BUCKET-NAME&gt;</code> placeholder with your bucket name.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb3-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb3-2" title="2">    <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb3-3" title="3">    <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb3-4" title="4">        <span class="fu">{</span></a>
+<a class="sourceLine" id="cb3-5" title="5">            <span class="dt">&quot;Sid&quot;</span><span class="fu">:</span> <span class="st">&quot;AllowS3ReadAccess&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb3-6" title="6">            <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb3-7" title="7">            <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb3-8" title="8">                <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:iam::123456789012:role/S3DynamoDBFullAccessRole&quot;</span></a>
+<a class="sourceLine" id="cb3-9" title="9">            <span class="fu">},</span></a>
+<a class="sourceLine" id="cb3-10" title="10">            <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;s3:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb3-11" title="11">            <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb3-12" title="12">                <span class="st">&quot;arn:aws:s3:::employee-photo-bucket-al-907&quot;</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb3-13" title="13">                <span class="st">&quot;arn:aws:s3:::employee-photo-bucket-al-907/*&quot;</span></a>
+<a class="sourceLine" id="cb3-14" title="14">            <span class="ot">]</span></a>
+<a class="sourceLine" id="cb3-15" title="15">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb3-16" title="16">    <span class="ot">]</span></a>
+<a class="sourceLine" id="cb3-17" title="17"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Choose <strong>Save changes</strong>.</p></li>
+</ol>
+<h2 id="task-4-modifying-the-application-to-use-the-s3-bucket">Task 4: Modifying the application to use the S3 bucket</h2>
+<p>In this task, you will launch another EC2 instance. This time, you will modify the user data script so that the application uses the S3 bucket.</p>
+<ol type="1">
+<li><p>In the <strong>Services</strong> search box, enter <code>EC2</code> and open the service by choosing <strong>EC2</strong>.</p></li>
+<li><p>In the navigation pane, under <strong>Instances</strong>, choose <strong>Instances</strong>.</p></li>
+<li><p>Select the <code>employee-directory-app</code> instance, which should be in the <em>Stopped</em> state.</p></li>
+<li><p>Choose <strong>Actions</strong> and then choose <strong>Image and templates</strong>, <strong>Launch more like this</strong>.</p></li>
+<li><p>For <strong>Name</strong> and at the end of the <strong>Value</strong>, append <code>-s3</code>.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">   <span class="ex">employee-directory-app-s3</span></a></code></pre></div></li>
+<li><p>For <strong>Key pair name</strong>, select <strong>app-key-pair</strong>.</p></li>
+<li><p>Under <strong>Network settings</strong> and <strong>Auto-assign Public IP</strong>, choose <strong>Enable</strong>.</p></li>
+<li><p>Scroll down and expand <strong>Advanced Details</strong>.</p></li>
+<li><p>In the <strong>User data</strong> box, update the values for the <code>PHOTOS_BUCKET</code> variable and (if needed) the <code>AWS_DEFAULT_REGION</code> variable.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="co">#!/bin/bash -ex</span></a>
+<a class="sourceLine" id="cb5-2" title="2"> <span class="fu">wget</span> https://aws-tc-largeobjects.s3-us-west-2.amazonaws.com/DEV-AWS-MO-GCNv2/FlaskApp.zip</a>
+<a class="sourceLine" id="cb5-3" title="3"> <span class="fu">unzip</span> FlaskApp.zip</a>
+<a class="sourceLine" id="cb5-4" title="4"> <span class="bu">cd</span> FlaskApp/</a>
+<a class="sourceLine" id="cb5-5" title="5"> <span class="ex">yum</span> -y install python3-pip</a>
+<a class="sourceLine" id="cb5-6" title="6"> <span class="ex">pip</span> install -r requirements.txt</a>
+<a class="sourceLine" id="cb5-7" title="7"> <span class="ex">yum</span> -y install stress</a>
+<a class="sourceLine" id="cb5-8" title="8"> <span class="bu">export</span> <span class="va">PHOTOS_BUCKET=${SUB_PHOTOS_BUCKET}</span></a>
+<a class="sourceLine" id="cb5-9" title="9"> <span class="bu">export</span> <span class="va">AWS_DEFAULT_REGION=</span><span class="op">&lt;</span><span class="ex">INSERT</span> REGION HERE<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb5-10" title="10"> <span class="bu">export</span> <span class="va">DYNAMO_MODE=</span>on</a>
+<a class="sourceLine" id="cb5-11" title="11"> <span class="va">FLASK_APP=</span>application.py <span class="ex">/usr/local/bin/flask</span> run --host=0.0.0.0 --port=80</a></code></pre></div>
+<p>Example:</p>
+<p>This example uses a sample bucket name.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="bu">export</span> <span class="va">PHOTOS_BUCKET=</span>employee-photo-bucket-al-907</a></code></pre></div></li>
+<li><p>Choose <strong>Launch instance</strong>.</p></li>
+<li><p>Choose <strong>View all instances</strong>.</p>
+<p>The new instance should now be in the <strong>Instances</strong> list.</p></li>
+<li><p>Wait for the <strong>Instance state</strong> to change to <em>Running</em> and the <em>Status check</em> to change to <em>2/2 checks passed</em>.</p>
+<p><strong>Note</strong>: You can refresh the page to update the instance status.</p></li>
+<li><p>If needed, clear the check box for the stopped instance that you created previously.</p></li>
+<li><p>Select the check box for the <strong>employee-directory-app-s3</strong> instance.</p></li>
+<li><p>Copy the <strong>Public IPv4 address</strong>.</p>
+<p><strong>Note</strong>: Make sure that you only copy the address instead of choosing the <strong>open address</strong> link.</p></li>
+<li><p>In a new browser window, paste the IP address that you copied. <em>Make sure to remove the ‘S’ after HTTP so you are using only HTTP instead</em>.</p></li>
+</ol>
+<p>You should see an <strong>Employee Directory</strong> placeholder. You won’t be able to interact with the application yet because it’s not connected to a database.</p>
+<p>Congratulations! You launched an EC2 instance that uses the S3 bucket you created.</p>
+<h2 id="task-5-deleting-the-object-from-the-s3-bucket">Task 5: Deleting the object from the S3 bucket</h2>
+<p>In this task, you will delete the object that you uploaded to the S3 bucket.</p>
+<ol type="1">
+<li><p>Open the Amazon S3 console by searching for and choosing <strong>S3</strong>.</p></li>
+<li><p>Open the bucket details by choosing the <code>employee-photo-bucket-</code> link.</p></li>
+<li><p>Select the check box for your object.</p></li>
+<li><p>Choose <strong>Delete</strong> and confirm the deletion by entering <code>permanently delete</code>.</p></li>
+<li><p>Choose <strong>Delete objects</strong> and then choose <strong>Close</strong>.</p></li>
+</ol>
+<h2 id="task-6-stopping-your-ec2-instance">Task 6: Stopping your EC2 instance</h2>
+<p>In this task, you will now stop the instance to prevent future costs.</p>
+<p><strong>Note</strong>: Don’t terminate the instance because you will use this instance in a later exercise.</p>
+<ol type="1">
+<li><p>Return to the Amazon EC2 console by searching for and choosing <strong>EC2</strong>.</p></li>
+<li><p>If needed, in the navigation pane, choose <strong>Instances</strong>.</p></li>
+<li><p>Select the check box for the <strong>employee-directory-app-s3</strong> instance.</p></li>
+<li><p>Choose <strong>Instance state</strong> and then choose <strong>Stop instance</strong>.</p></li>
+<li><p>In the dialog box, choose <strong>Stop</strong>.</p></li>
+</ol>
+<p>The <strong>Instance state</strong> will eventually go into the <em>Stopped</em> state.</p>
+<script>
+document.body.innerHTML = document.body.innerHTML.replace(/RELATIVE(.+)RELATIVE/g, function (match, capture) {
+  let tmp = document.createElement("DIV");
+  tmp.innerHTML = capture;
+  return new URL(tmp.textContent || tmp.innerText || "", document.baseURI).href;
+});
+</script>
+</body>
+<footer>
+    <p>© 2022 Amazon Web Services, Inc. or its affiliates. All rights reserved. This work may not be reproduced or redistributed, in whole or in part, without prior written permission from Amazon Web Services, Inc. Commercial copying, lending, or selling is prohibited. Corrections, feedback, or other questions? Contact us at <a href="https://support.aws.amazon.com/#/contacts/aws-training" target="_blank">https://support.aws.amazon.com/#/contacts/aws-training</a>. All trademarks are the property of their owners.</p>
+</footer>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Exercise 6: Databases</title>
+  <script src="scripts/clipboard.min.js"></script>
+  <script src="scripts/copybutton.js"></script>
+
+<style>
+    html, body, footer {
+        font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+        margin: 1em;
+    }
+
+    img:not(.clipboard){
+        max-width: 100%;
+        height: auto;
+        width: auto;
+    }
+
+    /* Copy buttons */
+    button.copybtn {
+        webkit-transition: opacity .3s ease-in-out;
+        -o-transition: opacity .3s ease-in-out;
+        transition: opacity .3s ease-in-out;
+        opacity: 0;
+        padding: 2px 6px;
+        position: absolute;
+        right: 4px;
+        top: 4px;
+    }
+    div.sourceCode:hover .copybtn, div.sourceCode .copybtn:focus {
+        opacity: .3;
+    }
+    div.sourceCode .copybtn:hover {
+        opacity: 1;
+    }
+    div.sourceCode {
+        position: relative;
+    }
+    .xmodule_display.xmodule_HtmlBlock ol {
+        padding: 0 0 0 2em !important;
+    }
+    .xmodule_display.xmodule_HtmlBlock ul {
+        padding: 0 0 0 2em !important;
+    }
+
+    code {
+        padding: 2px 4px !important;
+        background-color: #eee !important;
+        border-radius: 4px;
+    }
+    pre code {
+        padding: 9.5px !important;
+        background-color: #f5f5f5 !important;
+        display: block;
+        overflow-x: auto;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        word-break: break-all;
+        word-wrap: break-word;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        white-space: pre;
+    }
+    pre code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    pre code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    pre code span.at { color: #7d9029; } /* Attribute */
+    pre code span.bn { color: #40a070; } /* BaseN */
+    pre code span.bu { color: #06287e; } /* BuiltIn */
+    pre code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    pre code span.ch { color: #4070a0; } /* Char */
+    pre code span.cn { color: #880000; } /* Constant */
+    pre code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    pre code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    pre code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    pre code span.dt { color: #902000; } /* DataType */
+    pre code span.dv { color: #40a070; } /* DecVal */
+    pre code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    pre code span.ex { color: #06287e; } /* Extension */
+    pre code span.fl { color: #40a070; } /* Float */
+    pre code span.fu { color: #06287e; } /* Function */
+    pre code span.im { } /* Import */
+    pre code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    pre code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    pre code span.op { color: #666666; } /* Operator */
+    pre code span.ot { color: #007020; } /* Other */
+    pre code span.pp { color: #bc7a00; } /* Preprocessor */
+    pre code span.sc { color: #4070a0; } /* SpecialChar */
+    pre code span.ss { color: #bb6688; } /* SpecialString */
+    pre code span.st { color: #4070a0; } /* String */
+    pre code span.va { color: #19177c; } /* Variable */
+    pre code span.vs { color: #4070a0; } /* VerbatimString */
+    pre code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+    footer {
+        padding-top: 3em;
+        font-style: italic;
+        font-size: .9em;
+    }
+</style>
+<body>
+<p><em>[version_1.1]</em></p>
+<div style="background-color: #FFD2D2; padding: 15px; margin-bottom: 25px">
+<h3>
+<span class="fa fa-info-circle"></span> Note
+</h3>
+<p>The exercises in this course will have an associated charge in your AWS account. In this exercise, you create or use the following resources:</p>
+<ul>
+<li>AWS Identity and Access Management (IAM) policy and user (policies and users are AWS account features, offered at no additional charge)</li>
+<li>Amazon Elastic Compute Cloud (Amazon EC2) instance</li>
+<li>Amazon DynamoDB table</li>
+</ul>
+<p>Familiarize yourself with <strong><a href="https://aws.amazon.com/ec2/pricing/" target="_blank">Amazon EC2 pricing</a></strong>, <strong><a href="https://aws.amazon.com/dynamodb/pricing/" target="_blank">Amazon DynamoDB pricing</a></strong>, and the <strong><a href="https://aws.amazon.com/free/" target="_blank">AWS Free Tier</a></strong>.</p>
+</div>
+<h1 id="exercise-6-setting-up-the-database">Exercise 6: Setting up the Database</h1>
+<p>In this scenario, part of your responsibility is to keep the employee database up to date.</p>
+<p>In this exercise, you first launch another EC2 instance. Then, you create the DynamoDB table for the employee directory application.</p>
+<h2 id="task-1-launching-an-ec2-instance">Task 1: Launching an EC2 instance</h2>
+<p>In this task, you will launch another EC2 instance.</p>
+<ol type="1">
+<li><p>If needed, log in to the AWS Management Console as your <em>Admin</em> user.</p></li>
+<li><p>Open the Amazon EC2 console by searching for and choosing <strong>EC2</strong>.</p></li>
+<li><p>In the navigation pane, choose <strong>Instances</strong>.</p></li>
+<li><p>If needed, select the check box for the <strong>employee-directory-app-s3</strong> instance, which should be in the <em>Stopped</em> state.</p></li>
+<li><p>Choose <strong>Actions</strong> and then choose <strong>Image and templates</strong>, <strong>Launch more like this</strong>.</p></li>
+<li><p>For <strong>Name</strong> and at the end of the <strong>Value</strong>, append <code>-exercise6</code>.</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">   <span class="ex">employee-directory-app-exercise6</span></a></code></pre></div></li>
+<li><p>For <strong>Key pair name</strong>, select <strong>app-key-pair</strong>.</p></li>
+<li><p>Under <strong>Network settings</strong> and <strong>Auto-assign Public IP</strong>, choose <strong>Enable</strong>.</p></li>
+<li><p>Choose <strong>Launch instance</strong>.</p></li>
+<li><p>Choose <strong>View all instances</strong>.</p>
+<p>The instance should now be in the <strong>Instances</strong> list.</p></li>
+<li><p>Wait for the <strong>Instance state</strong> to change to <em>Running</em> and the <strong>Status check</strong> to change to <em>2/2 checks passed</em>.</p></li>
+<li><p>If needed, clear the check box for the <strong>employee-directory-app-s3</strong> instance.</p></li>
+<li><p>Select the check box for <strong>employee-directory-app-exercise6</strong>.</p></li>
+<li><p>Copy the <strong>Public IPv4 address</strong>.</p>
+<p><strong>Note</strong>: Make sure that you only copy the address instead of choosing the <strong>open address</strong> link.</p></li>
+<li><p>In a new browser window, paste the IP address that you copied. <em>Make sure to remove the ‘S’ after HTTP so you are using only HTTP instead</em>.</p></li>
+</ol>
+<p>You should see an <strong>Employee Directory</strong> placeholder. You won’t be able to interact with the application yet because it’s not connected to a database.</p>
+<ol type="1">
+<li>Close the application browser window.</li>
+</ol>
+<h2 id="task-2-creating-the-dynamodb-table">Task 2: Creating the DynamoDB table</h2>
+<p>To connect the application to a database, you first need to create one! In this task, you will create a database by using DynamoDB.</p>
+<ol type="1">
+<li><p>Return to the console, and search for and open <strong>DynamoDB</strong>.</p></li>
+<li><p>In the navigation pane, choose <strong>Tables</strong>.</p></li>
+<li>Choose <strong>Create table</strong> and configure the following settings.
+<ul>
+<li><strong>Table name</strong>: <code>Employees</code></li>
+<li><strong>Partition key</strong>: <code>id</code></li>
+</ul></li>
+<li><p>Choose <strong>Create table</strong>.</p></li>
+</ol>
+<h2 id="task-3-testing-the-application">Task 3: Testing the application</h2>
+<p>In this task, you will test whether the application works by using it to create an employee entry and upload a photo.</p>
+<ol type="1">
+<li><p>Return to the Amazon EC2 console by searching for and opening <strong>EC2</strong>.</p></li>
+<li><p>In the instance list, select the check box for the <strong>employee-directory-app-exercise6</strong> instance.</p></li>
+<li><p>On the <strong>Details</strong> tab, copy the <strong>Public IPv4 address</strong> and in a new browser window, paste the IP address.</p></li>
+<li><p>In the application interface, choose <strong>Add</strong>.</p></li>
+<li><p>Create a new employee entry by entering a name, location, and job title, and by selecting some attributes.</p></li>
+<li><p>Upload a picture by choosing <strong>Browse</strong> and uploading a picture of your choice.</p></li>
+<li><p>Choose <strong>Save</strong>.</p></li>
+<li><p>Create and save a few employee entries.</p></li>
+</ol>
+<p><strong>Note:</strong> You can also edit and delete entries.</p>
+<p>In the employee directory application, you should now see the list of employees (and their photos) that you added.</p>
+<h2 id="task-4-viewing-the-item-in-the-database">Task 4: Viewing the item in the database</h2>
+<p>In this task, you will see how the employee entries are stored in DynamoDB.</p>
+<ol type="1">
+<li><p>Return to the console, and search for and open <strong>DynamoDB</strong>.</p></li>
+<li><p>In the navigation pane, choose <strong>Tables</strong>.</p></li>
+<li><p>Open the table details by choosing the <strong>Employees</strong> link.</p></li>
+<li><p>Choose <strong>Explore table items</strong>.</p></li>
+</ol>
+<p>In the <strong>Items returned</strong> list, you should now see the entries in the database that you made by using the application on the EC2 instance.</p>
+<p>Congratulations! You launched an EC2 instance that uses the S3 bucket, and is connected to the DynamoDB table.</p>
+<h2 id="task-5-stopping-your-ec2-instance">Task 5: Stopping your EC2 instance</h2>
+<p>In this task, you will now stop the instance to prevent future costs from incurring.</p>
+<p><strong>Note:</strong> Do not terminate the instance because you will use it in the next exercise.</p>
+<ol type="1">
+<li><p>Return to the Amazon EC2 console by searching for and opening <strong>EC2</strong>.</p></li>
+<li><p>If needed, in the navigation pane, choose <strong>Instances</strong>.</p></li>
+<li><p>Select the check box for <strong>employee-directory-app-exercise6</strong>.</p></li>
+<li><p>Choose <strong>Instance state</strong> and then choose <strong>Stop instance</strong>.</p></li>
+<li><p>In the dialog box, choose <strong>Stop</strong>.</p></li>
+</ol>
+<p>The <strong>Instance state</strong> will eventually go into the <em>Stopped</em> state.</p>
+<script>
+document.body.innerHTML = document.body.innerHTML.replace(/RELATIVE(.+)RELATIVE/g, function (match, capture) {
+  let tmp = document.createElement("DIV");
+  tmp.innerHTML = capture;
+  return new URL(tmp.textContent || tmp.innerText || "", document.baseURI).href;
+});
+</script>
+</body>
+<footer>
+    <p>© 2022 Amazon Web Services, Inc. or its affiliates. All rights reserved. This work may not be reproduced or redistributed, in whole or in part, without prior written permission from Amazon Web Services, Inc. Commercial copying, lending, or selling is prohibited. Corrections, feedback, or other questions? Contact us at <a href="https://support.aws.amazon.com/#/contacts/aws-training" target="_blank">https://support.aws.amazon.com/#/contacts/aws-training</a>. All trademarks are the property of their owners.</p>
+</footer>
+</html>

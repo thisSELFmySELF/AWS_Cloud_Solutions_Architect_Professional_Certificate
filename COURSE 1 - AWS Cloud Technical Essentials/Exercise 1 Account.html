@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Exercise 1: Account</title>
+  <script src="scripts/clipboard.min.js"></script>
+  <script src="scripts/copybutton.js"></script>
+
+<style>
+    html, body, footer {
+        font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+        margin: 1em;
+    }
+
+    img:not(.clipboard){
+        max-width: 100%;
+        height: auto;
+        width: auto;
+    }
+
+    /* Copy buttons */
+    button.copybtn {
+        webkit-transition: opacity .3s ease-in-out;
+        -o-transition: opacity .3s ease-in-out;
+        transition: opacity .3s ease-in-out;
+        opacity: 0;
+        padding: 2px 6px;
+        position: absolute;
+        right: 4px;
+        top: 4px;
+    }
+    div.sourceCode:hover .copybtn, div.sourceCode .copybtn:focus {
+        opacity: .3;
+    }
+    div.sourceCode .copybtn:hover {
+        opacity: 1;
+    }
+    div.sourceCode {
+        position: relative;
+    }
+    .xmodule_display.xmodule_HtmlBlock ol {
+        padding: 0 0 0 2em !important;
+    }
+    .xmodule_display.xmodule_HtmlBlock ul {
+        padding: 0 0 0 2em !important;
+    }
+
+    code {
+        padding: 2px 4px !important;
+        background-color: #eee !important;
+        border-radius: 4px;
+    }
+    pre code {
+        padding: 9.5px !important;
+        background-color: #f5f5f5 !important;
+        display: block;
+        overflow-x: auto;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        word-break: break-all;
+        word-wrap: break-word;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        white-space: pre;
+    }
+    pre code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    pre code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    pre code span.at { color: #7d9029; } /* Attribute */
+    pre code span.bn { color: #40a070; } /* BaseN */
+    pre code span.bu { color: #06287e; } /* BuiltIn */
+    pre code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    pre code span.ch { color: #4070a0; } /* Char */
+    pre code span.cn { color: #880000; } /* Constant */
+    pre code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    pre code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    pre code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    pre code span.dt { color: #902000; } /* DataType */
+    pre code span.dv { color: #40a070; } /* DecVal */
+    pre code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    pre code span.ex { color: #06287e; } /* Extension */
+    pre code span.fl { color: #40a070; } /* Float */
+    pre code span.fu { color: #06287e; } /* Function */
+    pre code span.im { } /* Import */
+    pre code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    pre code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    pre code span.op { color: #666666; } /* Operator */
+    pre code span.ot { color: #007020; } /* Other */
+    pre code span.pp { color: #bc7a00; } /* Preprocessor */
+    pre code span.sc { color: #4070a0; } /* SpecialChar */
+    pre code span.ss { color: #bb6688; } /* SpecialString */
+    pre code span.st { color: #4070a0; } /* String */
+    pre code span.va { color: #19177c; } /* Variable */
+    pre code span.vs { color: #4070a0; } /* VerbatimString */
+    pre code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+    footer {
+        padding-top: 3em;
+        font-style: italic;
+        font-size: .9em;
+    }
+</style>
+<body>
+<p><em>[version_1.2]</em></p>
+<div style="background-color: #FFD2D2; padding: 15px; margin-bottom: 25px">
+<h3>
+<span class="fa fa-info-circle"></span> Note
+</h3>
+<p>The exercises in this course will have an associated charge in your AWS account. In this exercise, you create the following resources:</p>
+<ul>
+<li>AWS Identity and Access Management (IAM) policy and user (policies and users are AWS account features, offered at no additional charge)</li>
+<li>Amazon Simple Notification Service (Amazon SNS) topic</li>
+</ul>
+<p>Familiarize yourself with <strong><a href="https://aws.amazon.com/sns/pricing/" target="_blank">Amazon SNS pricing</a></strong> and the <strong><a href="https://aws.amazon.com/free/" target="_blank">AWS Free Tier</a></strong>.</p>
+</div>
+<p><i class="fas fa-info-circle"></i> Make sure for this exercise the region selected is N Virginia or <strong>us-east-1</strong>.</p>
+<h1 id="exercise-1-creating-an-aws-account">Exercise 1: Creating an AWS Account</h1>
+<p>In this scenario, you work for a company that currently has no presence in the cloud. You have been tasked with creating the company’s employee directory application in AWS.</p>
+<p>In this exercise, you will be creating and confirming a new AWS account. You will then log in to that account and do basic management tasks, such as choosing a support plan and setting up some account alerts.</p>
+<h2 id="task-1-signing-up-for-an-account">Task 1: Signing up for an account</h2>
+<p>In this task, you will start the process of signing up for an AWS account.</p>
+<ol type="1">
+<li><p>Visit the <a href="https://aws.amazon.com/" target="_blank">Amazon Web Services home page</a>.</p></li>
+<li><p>Choose <strong>Create an AWS Account</strong>.</p>
+<p><strong>Note:</strong> If you signed in to AWS recently, choose <strong>Sign in to the Console</strong>. If <strong>Create a new AWS account</strong> isn’t available, first choose <strong>Sign in to a different account</strong>, and then choose <strong>Create a new AWS account</strong>.</p></li>
+<li><p>Enter your account information, and then choose <strong>Continue</strong>.</p>
+<p>Be sure that you enter your account information correctly, especially your email address. If you enter your email address incorrectly, you won’t be able access your account.</p></li>
+<li><p>Choose <strong>Personal</strong> or <strong>Professional</strong>.</p>
+<p><strong>Note:</strong> These two account types are identical in functionality. You can choose <em>personal</em> for your personal projects. Choose <em>professional</em> for use within your company, an educational institution, or an organization.</p></li>
+<li><p>Enter your company or personal information.</p></li>
+<li><p>Read the <a href="https://aws.amazon.com/agreement/" target="_blank">AWS Customer Agreement</a>, and then select the box.</p></li>
+<li><p>Click <strong>Create Account and Continue</strong>.</p></li>
+</ol>
+<h2 id="task-2-adding-a-payment-method">Task 2: Adding a payment method</h2>
+<p>In this task, you will add a payment method to your account.</p>
+<ol type="1">
+<li><p>On the <strong>Payment Information</strong> page, add a payment method by entering the requested information about your payment method.</p></li>
+<li><p>Choose <strong>Verify and Add</strong>.</p>
+<p><strong>Important:</strong> You can’t proceed with the signup process until you add a valid payment method.</p></li>
+</ol>
+<h2 id="task-3-verifying-your-identity">Task 3: Verifying your identity</h2>
+<p>In this task, you will verify your identity for the account.</p>
+<ol type="1">
+<li><p>On the <strong>Identity Verification</strong> page, choose your country or region code from the list.</p></li>
+<li><p>Enter a phone number where you can be reached in the next few minutes.</p></li>
+<li><p>Enter the code that’s displayed in the <strong>CAPTCHA</strong>.</p></li>
+<li><p>When you’re ready to receive a call or Short Message Service (SMS) text message, choose <strong>Contact me/Send SMS</strong>.</p>
+<p>In a few moments, you should be contacted through the verification system.</p></li>
+<li><p>Enter the <strong>verification code</strong> that you received and choose <strong>Verify Code</strong>.</p></li>
+<li><p>Choose <strong>Continue</strong>.</p></li>
+</ol>
+<h2 id="task-4-choosing-an-aws-support-plan">Task 4: Choosing an AWS Support plan</h2>
+<p>In this task, you will select an AWS Support plan for your account.</p>
+<ol type="1">
+<li><p>On the <strong>Select a Support Plan</strong> page, select the <strong>Basic Plan</strong> that’s included in the <a href="https://aws/amazon.com/free" target="_blank">AWS Free Tier</a>.</p></li>
+<li><p>Sign in to the AWS Management Console.</p></li>
+</ol>
+<h2 id="task-5-setting-up-an-aws-free-tier-alert-and-custom-billing-alert">Task 5: Setting up an AWS Free Tier alert and custom billing alert</h2>
+<p>In this task, you will set up an alert for your AWS Free Tier usage. You will also set up a billing alert in Amazon CloudWatch.</p>
+<p>First, you will create a usage alert.</p>
+<ol type="1">
+<li><p>In the search box, enter <strong>Billing</strong> and open it.</p></li>
+<li><p>In the navigation bar, select <strong>Billing preferences</strong>.</p></li>
+<li><p>Under the <strong>Alert preferences</strong> section choose <strong>Edit</strong>.</p></li>
+<li><p>Verify <strong>Receive AWS Free Tier alerts</strong> is checked. If you would like an additional email address to receive the alerts. Enter that email address. The accounts root user email address is already set up to receive free tier alerts.</p></li>
+<li><p>Choose <strong>Update</strong> if any changes were made.</p>
+<p>You will now create a billing alert in CloudWatch.</p></li>
+<li><p>In the services search box, enter <strong>CloudWatch</strong> and open the service.</p></li>
+<li><p>If necessary, <em>change the Region</em> in the upper-right area of the console to <strong>US East (N. Virginia)</strong>.</p>
+<p>Billing metric data is stored in this Region, and this data represents worldwide charges.</p></li>
+<li><p>In the navigation pane, choose <strong>Alarms</strong> and <strong>Billing</strong>, then choose <strong>Create alarm</strong>.</p></li>
+<li><p>In the <strong>Metric</strong> box. It will have populated <strong>Namespace</strong>:<em>AWS/Billing</em>. <strong>Metric name</strong>:<em>EstimatedCharges</em>.</p></li>
+<li><p>Under <strong>Conditions</strong>, choose <strong>Static</strong>.</p></li>
+<li><p>For <strong>Whenever EstimatedCharges is</strong>, choose <strong>Greater</strong>.</p></li>
+<li><p>For <strong>than</strong>, enter the monthly amount that must be exceeded to start the alarm.</p>
+<p>The number you enter should be an amount that you’re comfortable with, such as <code>10</code>.</p></li>
+<li><p>Choose <strong>Next</strong>.</p>
+<p>You will now configure notifications for the alarm by setting up and subscribing to an Amazon Simple Notification Service (Amazon SNS) topic. Amazon SNS is a service that publishes messages to a topic, which delivers the message to all topic subscribers.</p></li>
+<li><p>For <strong>Alarm State Trigger</strong>, select <strong>In alarm</strong>.</p></li>
+<li><p>For <strong>Select an SNS Topic</strong>, choose <strong>Create new topic</strong>.</p></li>
+<li><p>Enter a topic name.</p>
+<p>The name must be unique.</p></li>
+<li><p>Enter the email address where you want to receive the notification.</p>
+<p><strong>Note:</strong> You will get an email in your inbox that asks you to confirm your subscription to this topic. By confirming, you should get notifications when your estimated billing charges go over your threshold.</p></li>
+<li><p>Choose <strong>Create topic</strong> and then choose <strong>Next</strong>.</p></li>
+<li><p>Enter an alarm name and description.</p>
+<p>The name must contain only ASCII characters.</p></li>
+<li><p>Choose <strong>Next</strong>. Finally choose <strong>Create alarm</strong>.</p></li>
+</ol>
+<script>
+document.body.innerHTML = document.body.innerHTML.replace(/RELATIVE(.+)RELATIVE/g, function (match, capture) {
+  let tmp = document.createElement("DIV");
+  tmp.innerHTML = capture;
+  return new URL(tmp.textContent || tmp.innerText || "", document.baseURI).href;
+});
+</script>
+</body>
+<footer>
+    <p>© 2022 Amazon Web Services, Inc. or its affiliates. All rights reserved. This work may not be reproduced or redistributed, in whole or in part, without prior written permission from Amazon Web Services, Inc. Commercial copying, lending, or selling is prohibited. Corrections, feedback, or other questions? Contact us at <a href="https://support.aws.amazon.com/#/contacts/aws-training" target="_blank">https://support.aws.amazon.com/#/contacts/aws-training</a>. All trademarks are the property of their owners.</p>
+</footer>
+</html>

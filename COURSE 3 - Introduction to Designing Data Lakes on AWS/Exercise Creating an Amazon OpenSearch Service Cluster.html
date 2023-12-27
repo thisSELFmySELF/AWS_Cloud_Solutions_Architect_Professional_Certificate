@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Exercise: Creating an Amazon OpenSearch Service Cluster</title>
+  <script src="scripts/clipboard.min.js"></script>
+  <script src="scripts/copybutton.js"></script>
+
+<style>
+    html, body, footer {
+        font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+        margin: 1em;
+    }
+
+    img:not(.clipboard){
+        max-width: 100%;
+        height: auto;
+        width: auto;
+    }
+
+    /* Copy buttons */
+    button.copybtn {
+        webkit-transition: opacity .3s ease-in-out;
+        -o-transition: opacity .3s ease-in-out;
+        transition: opacity .3s ease-in-out;
+        opacity: 0;
+        padding: 2px 6px;
+        position: absolute;
+        right: 4px;
+        top: 4px;
+    }
+    div.sourceCode:hover .copybtn, div.sourceCode .copybtn:focus {
+        opacity: .3;
+    }
+    div.sourceCode .copybtn:hover {
+        opacity: 1;
+    }
+    div.sourceCode {
+        position: relative;
+    }
+    .xmodule_display.xmodule_HtmlBlock ol {
+        padding: 0 0 0 2em !important;
+    }
+    .xmodule_display.xmodule_HtmlBlock ul {
+        padding: 0 0 0 2em !important;
+    }
+
+    code {
+        padding: 2px 4px !important;
+        background-color: #eee !important;
+        border-radius: 4px;
+    }
+    pre code {
+        padding: 9.5px !important;
+        background-color: #f5f5f5 !important;
+        display: block;
+        overflow-x: auto;
+        margin: 0 0 10px;
+        font-size: 13px;
+        line-height: 1.42857143;
+        word-break: break-all;
+        word-wrap: break-word;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        white-space: pre;
+    }
+    pre code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    pre code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    pre code span.at { color: #7d9029; } /* Attribute */
+    pre code span.bn { color: #40a070; } /* BaseN */
+    pre code span.bu { color: #06287e; } /* BuiltIn */
+    pre code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    pre code span.ch { color: #4070a0; } /* Char */
+    pre code span.cn { color: #880000; } /* Constant */
+    pre code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    pre code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    pre code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    pre code span.dt { color: #902000; } /* DataType */
+    pre code span.dv { color: #40a070; } /* DecVal */
+    pre code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    pre code span.ex { color: #06287e; } /* Extension */
+    pre code span.fl { color: #40a070; } /* Float */
+    pre code span.fu { color: #06287e; } /* Function */
+    pre code span.im { } /* Import */
+    pre code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    pre code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    pre code span.op { color: #666666; } /* Operator */
+    pre code span.ot { color: #007020; } /* Other */
+    pre code span.pp { color: #bc7a00; } /* Preprocessor */
+    pre code span.sc { color: #4070a0; } /* SpecialChar */
+    pre code span.ss { color: #bb6688; } /* SpecialString */
+    pre code span.st { color: #4070a0; } /* String */
+    pre code span.va { color: #19177c; } /* Variable */
+    pre code span.vs { color: #4070a0; } /* VerbatimString */
+    pre code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+    footer {
+        padding-top: 3em;
+        font-style: italic;
+        font-size: .9em;
+    }
+</style>
+<body>
+<p><em>[version_1.0]</em></p>
+<div style="background-color: #FFD2D2; padding: 15px; margin-bottom: 25px">
+<h3>
+<span class="fa fa-info-circle"></span> Note
+</h3>
+<p>The exercises in this course will have an associated charge in your AWS account. In this exercise, you will create the following resources:</p>
+<ul>
+<li>AWS Identity and Access Management (IAM) policy and user (policies and users are AWS account features, offered at no additional charge)</li>
+<li>Amazon Simple Storage Service (Amazon S3) bucket</li>
+<li>Amazon OpenSearch Service cluster</li>
+<li>AWS Lambda function</li>
+<li>Amazon API Gateway API</li>
+</ul>
+<p><strong>The final exercise task includes instructions to delete all the resources that you create for this exercise.</strong></p>
+<p>Familiarize yourself with <strong><a href="https://aws.amazon.com/s3/pricing/" target="_blank">Amazon S3 pricing</a></strong>, <strong><a href="https://aws.amazon.com/opensearch-service/pricing/" target="_blank">Amazon OpenSearch Service pricing</a></strong>, <strong><a href="https://aws.amazon.com/lambda/pricing/" target="_blank">AWS Lambda pricing</a></strong>, <strong><a href="https://aws.amazon.com/api-gateway/pricing/" target="_blank">Amazon API Gateway pricing</a></strong>, and the <strong><a href="https://aws.amazon.com/free/" target="_blank">AWS Free Tier</a></strong>.</p>
+</div>
+<h1 id="exercise-creating-an-amazon-opensearch-service-cluster">Exercise: Creating an Amazon OpenSearch Service Cluster</h1>
+<p>Your company is measuring the temperature of water in lakes, ponds, and streams around your area. They have deployed sensors to each body of water they are monitoring. The sensors can make HTTPS calls that include the sensor ID and temperature reading on the request payload. The plan is for the sensors to record temperature-reading data every 15 minutes. They will then upload the data to an AWS data lake, through an HTTPS request, for each 15-minute interval.</p>
+<p>You are tasked with creating a way to ingest data into a data lake that’s hosted on AWS. The data lake uses Amazon Simple Storage Service (Amazon S3) as the storage layer, and Amazon OpenSearch Service for index and search capabilities.</p>
+<p>You will use Amazon API Gateway to ingest the data that is sent from the sensor, which invokes an AWS Lambda function. This Lambda function will take the payload of the request. First, it will write a file to an S3 bucket. The file name is a combination of the sensor ID and the timestamp. The file contents include the sensorID, the timestamp, and the temperature reading. The Lambda function will then load the record to OpenSearch Service.</p>
+<p>This method of ingesting data has a relatively small payload for each individual record. However, potentially hundreds of sensors from the area might post data every 15 minutes, which could produce many records.</p>
+<p>After the data is stored in Amazon S3, you could then use other analysis tools for various use cases. For example, you might have other weather-related data that you are ingesting by using another solution. You could combine that data with the sensor data to provide insights. Another example is that other people in the organization might want access to the raw data to do their own visualization or analysis by using the tools that they’re familiar with.</p>
+<p>Data lake architectures often combine many different ingestion methods and analysis methods into one architecture. In this exercise, you will focus on one ingestion solution by using API Gateway and Lambda, and by using Amazon OpenSearch as the search and indexing solution. However, you could also use Amazon Kinesis for ingestion and AWS Glue for cataloging the data. You will learn about these services in more depth in future lessons. One AWS service isn’t any better than another AWS service. Instead, some services best fit certain use cases—and you can decide which services you want to use in your data lake designs.</p>
+<h2 id="setting-up">Setting up</h2>
+<p>In this exercise, you will ingest mock data into a data lake. Download the following .zip file that contains sample data: <a href="downloads/upload-data.zip">upload-data</a>. You will use the file for the Lambda function in the following task.</p>
+<p>Before you begin ingesting data into a data lake, you must create an AWS Identity and Access Management (IAM) role. An IAM role defines specific account permissions, or what you can or can’t do in the AWS Cloud.</p>
+<p>To complete instructions in this exercise, you must grant full access permissions to Amazon S3 and Amazon OpenSearch Services.</p>
+<ol type="1">
+<li><p>In the AWS Management Console menu bar, in the search box, enter <code>IAM</code> and then open the IAM dashboard by choosing <strong>IAM</strong>.</p></li>
+<li><p>In the navigation pane, choose <strong>Roles</strong>.</p></li>
+<li><p>Choose <strong>Create role</strong>.</p></li>
+<li><p>For <strong>Use case</strong>, select <strong>Lambda</strong> and then choose <strong>Next</strong>.</p></li>
+<li><p>In the <strong>Permissions policies</strong> search box, enter <code>AmazonS3</code> and press Enter.</p></li>
+<li><p>From the list of results, select <code>AmazonS3FullAccess</code>.</p></li>
+<li><p>Clear the <strong>AmazonS3</strong> filter.</p></li>
+<li><p>In the search box, enter <code>AmazonES</code> and press Enter.</p></li>
+<li><p>Select <code>AmazonESFullAccess</code> and then choose <strong>Next</strong>.</p></li>
+<li><p>For <strong>Role name</strong>, paste <code>data-lake-week-2</code>.</p></li>
+<li><p>Choose <strong>Create role</strong>.</p></li>
+</ol>
+<h2 id="task-1-creating-an-amazon-opensearch-service-cluster">Task 1: Creating an Amazon OpenSearch Service cluster</h2>
+<p>You will use OpenSearch Service for its cataloging and indexing capabilities. Before you start ingesting documents to your OpenSearch Service domain, you must create a domain. You could also use AWS Glue for cataloging your data. However, you will explore AWS Glue in a future lesson.</p>
+<p>In this task, you create an OpenSearch Service domain.</p>
+<ol type="1">
+<li><p>Choose <strong>Services</strong>, and search for and open <strong>Amazon OpenSearch Service</strong>.</p></li>
+<li>Choose <strong>Create domain</strong> and configure the following settings.
+<ul>
+<li><strong>Domain name</strong>: <code>water-temp-domain</code></li>
+<li><strong>Deployment type</strong>: <em>Development and testing</em></li>
+<li><strong>Version</strong>: Choose the latest version of <em>OpenSearch</em></li>
+<li><strong>Data nodes</strong>, <strong>Instance type</strong>: <em>t3.small.search</em></li>
+<li><strong>Network</strong>: <em>Public access</em></li>
+<li><strong>Enable fine-grained access control</strong>: Clear this setting</li>
+<li><strong>Access policy</strong>, <strong>Domain access policy</strong>: <em>Configure domain level access policy</em></li>
+</ul>
+<p>In the <strong>Elements</strong> section, you can configure a principal that is allowed to access the domain. Use your IPv4 address to restrict access to the OpenSearch Service domain.</p></li>
+<li><p>First, find your IPv4 address by using an online lookup service (such as <a href="https://www.whatismyip.com/">What Is My IP</a>) and note your <strong>IPv4</strong> address.</p></li>
+<li>In the <strong>Elements</strong> section, configure the following settings.
+<ul>
+<li><strong>Type</strong>: <em>IPv4 address</em></li>
+<li><strong>Principal</strong>: Replace the asterisk (<code>*</code>) with your <em>IPv4 address</em></li>
+<li><strong>Action</strong>: <em>Allow</em></li>
+</ul></li>
+<li><p>Choose the <strong>JSON</strong> tab and note that the policy only allows your IPv4 address to access the OpenSearch Service domain:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb1-4" title="4">    <span class="fu">{</span></a>
+<a class="sourceLine" id="cb1-5" title="5">      <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb1-6" title="6">      <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb1-7" title="7">        <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;*&quot;</span></a>
+<a class="sourceLine" id="cb1-8" title="8">      <span class="fu">},</span></a>
+<a class="sourceLine" id="cb1-9" title="9">      <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb1-10" title="10">        <span class="st">&quot;es:*&quot;</span></a>
+<a class="sourceLine" id="cb1-11" title="11">      <span class="ot">]</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb1-12" title="12">      <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:es:us-east-1:000000000000:domain/water-temp-domain/*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb1-13" title="13">      <span class="dt">&quot;Condition&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb1-14" title="14">        <span class="dt">&quot;IpAddress&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb1-15" title="15">          <span class="dt">&quot;aws:SourceIp&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb1-16" title="16">            <span class="st">&quot;x.x.x.x&quot;</span></a>
+<a class="sourceLine" id="cb1-17" title="17">          <span class="ot">]</span></a>
+<a class="sourceLine" id="cb1-18" title="18">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb1-19" title="19">      <span class="fu">}</span></a>
+<a class="sourceLine" id="cb1-20" title="20">    <span class="fu">}</span></a>
+<a class="sourceLine" id="cb1-21" title="21">  <span class="ot">]</span></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Choose <strong>Create</strong>.</p></li>
+</ol>
+<p><strong>Note</strong>: The domain-creation process can take up to 15 minutes to complete.</p>
+<h2 id="task-2-creating-an-s3-bucket">Task 2: Creating an S3 bucket</h2>
+<p>In this task, you create an object storage bucket for the data that’s collected from sensors.</p>
+<p>In this exercise, you use OpenSearch Service for one specific use case. Though you will load your data into OpenSearch Service, Amazon S3 will serve as the storage layer for your data lake. The idea is that you likely have multiple use cases for the data in a data lake. Each use case uses its own set of appropriate services and tooling. By storing the raw data in Amazon S3, the data is then accessible for many use cases and various services.</p>
+<p>To create an S3 bucket:</p>
+<ol type="1">
+<li><p>Choose <strong>Services</strong>, and search for and open <strong>S3</strong>.</p></li>
+<li><p>Choose <strong>Create bucket</strong>.</p></li>
+<li><p>Enter a bucket name.</p>
+<p>The bucket name must be globally unique and DNS compliant. You can name the bucket similar to the following example by using your initials for the FMI, which stands for <em>Fill Me In</em>. When you replace the FMI with your own value, make sure that you also delete the angle brackets (&lt;&gt;).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb2-1" title="1"><span class="er">datalakes-week2-&lt;FMI&gt;</span> </a></code></pre></div>
+<p><strong>Note</strong>: If bucket name isn’t available after you add your initials, add some numbers to the end of the name.</p>
+<p>Examples:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb3-1" title="1"><span class="er">datalakes-week2-emr</span></a>
+<a class="sourceLine" id="cb3-2" title="2"></a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="er">datalakes-week2-emr1220</span></a></code></pre></div></li>
+<li><p>For <strong>AWS Region</strong>, the selected Region should be <em>US East (N. Virginia) us-east-1</em>.</p>
+<p>The bucket Region should be the same Region that your OpenSearch Service cluster is in.</p></li>
+<li><p>Choose <strong>Create bucket</strong>.</p></li>
+<li><p>Note the name of your S3 bucket. You will need to use its name in future steps.</p></li>
+</ol>
+<p>You now have an S3 bucket that is the storage layer for your data lake. In a later task, you modify the bucket access policy so that Lambda can write files to the bucket. You will learn about bucket access policies in future lessons.</p>
+<h2 id="task-3-creating-the-lambda-function">Task 3: Creating the Lambda function</h2>
+<p>AWS Lambda is a serverless compute service. The code that you upload to a Lambda function doesn’t run continually. Instead, it runs when an event occurs.</p>
+<p>In this task, the code for the Lambda function is already written. However, you need to create and configure the Lambda function.</p>
+<p>The Lambda function first captures the data that is in the payload of the incoming request. Next, it uploads a JSON document to Amazon S3. Finally, the Lambda function uploads the document to OpenSearch Service.</p>
+<p>To create the Lambda function:</p>
+<ol type="1">
+<li><p>Choose <strong>Services</strong>, and search for and open <strong>Lambda</strong>.</p></li>
+<li>Choose <strong>Create function</strong> and configure the following settings.
+<ul>
+<li><strong>Author from scratch</strong>: Keep this option selected</li>
+<li><strong>Function name</strong>: <code>upload-data</code></li>
+<li><strong>Runtime</strong>: Select the <em>latest supported version of Python</em></li>
+<li><strong>Permissions</strong>: Expand <em>Change default execution role</em></li>
+<li><strong>Execution role</strong>: <em>Use an existing role</em></li>
+<li><strong>Existing role</strong>: <em>data-lake-week-2</em></li>
+</ul>
+<p>The Lambda function you create needs access to permissions to sign API calls that write to Amazon S3 and OpenSearch Service.</p></li>
+<li><p>Choose <strong>Create function</strong>.</p></li>
+<li><p>Scroll to the <strong>Code</strong> tab.</p></li>
+<li><p>From the <strong>Upload from</strong> menu, choose <strong>.zip file</strong>.</p></li>
+<li><p>Choose <strong>Upload</strong>.</p></li>
+<li><p>Browse to where you saved the <code>upload-data.zip</code> file, choose the file, and choose <strong>Open</strong>.</p></li>
+<li><p>Back in the <strong>Upload a .zip file</strong> dialog box, choose <strong>Save</strong>.</p></li>
+<li><p>In the <strong>Code</strong> tab, scroll to <strong>Runtime settings</strong> and choose <strong>Edit</strong>.</p></li>
+<li><p>In the <strong>Handler</strong> box, replace the existing value with <code>lambda.handler</code> and choose <strong>Save</strong>.</p></li>
+<li><p>Choose the <strong>Configuration</strong> tab.</p></li>
+<li><p>On the tab menu, choose <strong>Environment variables</strong> and then choose <strong>Edit</strong>.</p></li>
+<li>Choose <strong>Add environment variable</strong> and configure the following settings.
+<ul>
+<li><strong>Key</strong>: <code>S3_BUCKET</code></li>
+<li><strong>Value</strong>: Paste your bucket name</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">datalakes-week2-emr</span></a></code></pre></div></li>
+<li><p>Choose <strong>Save</strong>.</p>
+<p>You can use environment variables to adjust your function’s behavior without updating code. In a future step, you will add another environment variable for the OpenSearch Service domain.</p></li>
+<li><p>In the <strong>Configuration</strong> tab menu, choose <strong>Permissions</strong>.</p></li>
+<li><p>Under <strong>Role name</strong>, choose the <strong>data-lake-week-2</strong> link.</p>
+<p><strong>Note</strong>: This action opens the IAM console in a separate window.</p></li>
+<li><p>Copy the role Amazon Resource Name (ARN), which should look similar to the following example:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">arn</span>:aws:iam::000000000000:role/data-lake-week-2</a></code></pre></div></li>
+</ol>
+<p>You need this ARN for the following task.</p>
+<h2 id="task-4-modifying-the-s3-bucket-policy-and-opensearch-service-cluster-for-lambda-access">Task 4: Modifying the S3 bucket policy and OpenSearch Service cluster for Lambda access</h2>
+<p>The Lambda function writes data to the S3 bucket. You already associated an IAM role with the Lambda function in the <strong>Setting up</strong> section. However, the role by itself won’t allow access. You must also modify the S3 bucket policy, which determines whether AWS principals are allowed or denied access to the bucket.</p>
+<ol type="1">
+<li><p>Return to the <strong>Amazon S3</strong> console.</p></li>
+<li><p>Open the bucket that you created previously in this exercise.</p></li>
+<li><p>Choose the <strong>Permissions</strong> tab, scroll to <strong>Bucket policy</strong>, and choose <strong>Edit</strong>.</p></li>
+<li><p>In the following JSON code, replace the first FMI with the Lambda role ARN:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb6-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb6-2" title="2">    <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-3" title="3">    <span class="dt">&quot;Id&quot;</span><span class="fu">:</span> <span class="st">&quot;ExamplePolicy&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-4" title="4">    <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb6-5" title="5">        <span class="fu">{</span></a>
+<a class="sourceLine" id="cb6-6" title="6">            <span class="dt">&quot;Sid&quot;</span><span class="fu">:</span> <span class="st">&quot;ExampleStmt&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-7" title="7">            <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-8" title="8">            <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb6-9" title="9">                <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;FMI&gt;&quot;</span></a>
+<a class="sourceLine" id="cb6-10" title="10">            <span class="fu">},</span></a>
+<a class="sourceLine" id="cb6-11" title="11">            <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;s3:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb6-12" title="12">            <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="st">&quot;&lt;FMI&gt;/*&quot;</span></a>
+<a class="sourceLine" id="cb6-13" title="13">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb6-14" title="14">    <span class="ot">]</span></a>
+<a class="sourceLine" id="cb6-15" title="15"><span class="fu">}</span> </a></code></pre></div>
+<p>Example:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb7-1" title="1">        <span class="er">&quot;Principal&quot;:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb7-2" title="2">            <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:iam::xxxxxxxxxxxx:role/data-lake-week-2&quot;</span></a>
+<a class="sourceLine" id="cb7-3" title="3">        <span class="fu">}</span><span class="er">,</span></a></code></pre></div></li>
+<li><p>Replace the second FMI with the ARN of your bucket:</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb8-1" title="1">          <span class="er">&quot;Action&quot;:</span> <span class="er">&quot;s3:*&quot;,</span></a>
+<a class="sourceLine" id="cb8-2" title="2">          <span class="er">&quot;Resource&quot;:</span> <span class="er">&quot;arn:aws:s3:::datalakes-week2-emr/*&quot;</span></a>
+<a class="sourceLine" id="cb8-3" title="3">      <span class="er">}</span></a></code></pre></div></li>
+<li><p>In the <strong>Bucket policy editor</strong>, paste the bucket policy that you configured.</p>
+<p>This policy allows the Lambda function to upload the temperature files to your bucket. The final policy should look similar to the following example, but <em>with your account number and bucket name</em>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb9-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb9-2" title="2">    <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="dt">&quot;Id&quot;</span><span class="fu">:</span> <span class="st">&quot;ExamplePolicy&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb9-4" title="4">    <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb9-5" title="5">        <span class="fu">{</span></a>
+<a class="sourceLine" id="cb9-6" title="6">            <span class="dt">&quot;Sid&quot;</span><span class="fu">:</span> <span class="st">&quot;ExampleStmt&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb9-7" title="7">            <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb9-8" title="8">            <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb9-9" title="9">                <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:iam::xxxxxxxxxxxx:role/data-lake-week-2&quot;</span></a>
+<a class="sourceLine" id="cb9-10" title="10">            <span class="fu">},</span></a>
+<a class="sourceLine" id="cb9-11" title="11">            <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;s3:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb9-12" title="12">            <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:s3:::datalakes-week2-xxx/*&quot;</span></a>
+<a class="sourceLine" id="cb9-13" title="13">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb9-14" title="14">    <span class="ot">]</span></a>
+<a class="sourceLine" id="cb9-15" title="15"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Choose <strong>Save changes</strong>.</p></li>
+<li><p>Return to the <strong>OpenSearch Service</strong> console.</p></li>
+<li><p>Choose <strong>water-temp-domain</strong>.</p>
+<p>The <strong>Domain status</strong> should now say “Active.” If not, wait a few minutes and refresh the page until the status is “Active.”</p>
+<p><strong>Note</strong>: Make sure that you are in the <strong>N. Virginia</strong> Region.</p></li>
+<li><p>Note the <strong>Domain endpoint</strong>, which should look similar tp the following example:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="ex">https</span>://search-water-temp-domain-xxxxxxxxxxxxxxxxxxxxxxxxx.us-east-1.es.amazonaws.com</a></code></pre></div></li>
+<li><p>Choose <strong>Actions</strong> and select <strong>Edit security configuration</strong>.</p></li>
+<li><p>Scroll to <strong>Access policy</strong> and review the policy.</p>
+<p>Currently, the policy restricts access by IP address. The current policy should look similar to the following example:</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb11-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb11-2" title="2">  <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb11-3" title="3">  <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb11-4" title="4">    <span class="fu">{</span></a>
+<a class="sourceLine" id="cb11-5" title="5">      <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb11-6" title="6">      <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb11-7" title="7">        <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;*&quot;</span></a>
+<a class="sourceLine" id="cb11-8" title="8">      <span class="fu">},</span></a>
+<a class="sourceLine" id="cb11-9" title="9">      <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;es:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb11-10" title="10">      <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:es:us-east-1:000000000000:domain/water-temp-domain/*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb11-11" title="11">      <span class="dt">&quot;Condition&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb11-12" title="12">        <span class="dt">&quot;IpAddress&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb11-13" title="13">          <span class="dt">&quot;aws:SourceIp&quot;</span><span class="fu">:</span> <span class="st">&quot;x.x.x.x&quot;</span></a>
+<a class="sourceLine" id="cb11-14" title="14">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb11-15" title="15">      <span class="fu">}</span></a>
+<a class="sourceLine" id="cb11-16" title="16">    <span class="fu">}</span></a>
+<a class="sourceLine" id="cb11-17" title="17">  <span class="ot">]</span></a>
+<a class="sourceLine" id="cb11-18" title="18"><span class="fu">}</span></a></code></pre></div>
+<p>The Lambda function should also have access to the domain, so you will add it in the following step.</p></li>
+<li><p>Add Lambda access to the policy and update values with your account number.</p>
+<p>The policy must look similar to the following example, but <em>with your account number and IP address</em>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb12-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-2" title="2">  <span class="dt">&quot;Version&quot;</span><span class="fu">:</span> <span class="st">&quot;2012-10-17&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-3" title="3">  <span class="dt">&quot;Statement&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb12-4" title="4">    <span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-5" title="5">      <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-6" title="6">      <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-7" title="7">        <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;*&quot;</span></a>
+<a class="sourceLine" id="cb12-8" title="8">      <span class="fu">},</span></a>
+<a class="sourceLine" id="cb12-9" title="9">      <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;es:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-10" title="10">      <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:es:us-east-1:000000000000:domain/water-temp-domain/*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-11" title="11">      <span class="dt">&quot;Condition&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-12" title="12">        <span class="dt">&quot;IpAddress&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-13" title="13">          <span class="dt">&quot;aws:SourceIp&quot;</span><span class="fu">:</span> <span class="st">&quot;x.x.x.x&quot;</span></a>
+<a class="sourceLine" id="cb12-14" title="14">        <span class="fu">}</span></a>
+<a class="sourceLine" id="cb12-15" title="15">      <span class="fu">}</span></a>
+<a class="sourceLine" id="cb12-16" title="16">    <span class="fu">}</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb12-17" title="17">    <span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-18" title="18">      <span class="dt">&quot;Effect&quot;</span><span class="fu">:</span> <span class="st">&quot;Allow&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-19" title="19">      <span class="dt">&quot;Principal&quot;</span><span class="fu">:</span> <span class="fu">{</span></a>
+<a class="sourceLine" id="cb12-20" title="20">        <span class="dt">&quot;AWS&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:iam::000000000000:role/data-lake-week-2&quot;</span></a>
+<a class="sourceLine" id="cb12-21" title="21">      <span class="fu">},</span></a>
+<a class="sourceLine" id="cb12-22" title="22">      <span class="dt">&quot;Action&quot;</span><span class="fu">:</span> <span class="st">&quot;es:*&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb12-23" title="23">      <span class="dt">&quot;Resource&quot;</span><span class="fu">:</span> <span class="st">&quot;arn:aws:es:us-east-1:000000000000:domain/water-temp-domain/*&quot;</span></a>
+<a class="sourceLine" id="cb12-24" title="24">    <span class="fu">}</span></a>
+<a class="sourceLine" id="cb12-25" title="25">  <span class="ot">]</span></a>
+<a class="sourceLine" id="cb12-26" title="26"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Choose <strong>Save changes</strong>.</p></li>
+</ol>
+<h2 id="task-5-modifying-the-lambda-function-and-creating-an-api-gateway-endpoint">Task 5: Modifying the Lambda function and creating an API Gateway endpoint</h2>
+<p>You now have an OpenSearch Service domain and an S3 bucket. You need to modify one final thing for the Lambda function to work.</p>
+<p>After the Lambda function is configured, you need a way to run the function. Lambda functions run based on events. In this case, the sensors that record the temperature data make HTTPS POST requests, with the data in the payload. You use API Gateway to create an API endpoint that receives the HTTPS POST requests. After API Gateway receives and validates the request, it invokes the Lambda function and passes the information to it. The Lambda function then writes the data to Amazon S3 and OpenSearch Service.</p>
+<h3 id="step-5.1-adding-a-new-environment-variable-to-lambda">Step 5.1: Adding a new environment variable to Lambda</h3>
+<ol type="1">
+<li><p>Return to the <strong>Lambda</strong> console.</p></li>
+<li><p>Choose the <strong>upload-data</strong> function and then choose the <strong>Configuration</strong> tab.</p></li>
+<li><p>On the tab menu, choose <strong>Environment variables</strong> and then choose <strong>Edit</strong>.</p></li>
+<li><p>Choose <strong>Add environment variable</strong> and configure the following settings.</p>
+<ul>
+<li><strong>Key</strong>: <code>ES_DOMAIN_URL</code></li>
+<li><strong>Value</strong>: Paste the OpenSearch Service domain endpoint that you noted previously.</li>
+</ul>
+<p>It should look similar to the following example:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1"><span class="ex">https</span>://search-water-temp-domain-xxxxxxxxxxxxxxxxxxxxxxxxx.us-east-1.es.amazonaws.com</a></code></pre></div>
+<p>Ensure that the OpenSearch Service domain endpoint doesn’t have a slash (/) at the end.</p></li>
+<li><p>Choose <strong>Save</strong>.</p></li>
+</ol>
+<h3 id="step-5.2-creating-a-rest-api">Step 5.2: Creating a REST API</h3>
+<p>After you set up the variable for OpenSearch Service, you create a REST API in Amazon API Gateway to receive data from the sensors. In this exercise, you manually enter test data to simulate requests from the sensors.</p>
+<ol type="1">
+<li><p>Choose <strong>Services</strong>, and search for and open <strong>API Gateway</strong>.</p></li>
+<li><p>On the <strong>REST API</strong> card, choose <strong>Build</strong>.</p></li>
+<li><p>If needed, close the <strong>Create your first API</strong> dialog box by choosing <strong>OK</strong>.</p></li>
+<li><p>For <strong>Create new API</strong>, select <strong>New API</strong>.</p></li>
+<li><p>In the <strong>API name</strong> box, paste <code>sensor-data</code> and choose <strong>Create API</strong>.</p></li>
+<li><p>In the <strong>Resources</strong> pane, on the <strong>Actions</strong> menu, choose <strong>Create Method</strong>.</p></li>
+<li><p>On the dropdown menu, choose <strong>POST</strong>, and confirm your selection by choosing the checkmark.</p></li>
+<li><p>In the <strong>POST - Setup</strong> pane, keep the <strong>Integration type</strong> setting at <strong>Lambda Function</strong>.</p></li>
+<li><p>In the <strong>Lambda Function</strong> box, enter <code>upload-data</code> and select it when it appears.</p></li>
+<li><p>Choose <strong>Save</strong>, and in the <strong>Add Permission to Lambda Function</strong> dialog box, choose <strong>OK</strong>.</p></li>
+<li><p>In the <strong>POST - Method Execution pane</strong>, choose <strong>TEST</strong>.</p></li>
+<li><p>Scroll to the <strong>Request Body</strong> box and paste the following JSON code:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb14-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="dt">&quot;sensorID&quot;</span> <span class="fu">:</span> <span class="st">&quot;0025&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="dt">&quot;temperature&quot;</span> <span class="fu">:</span> <span class="st">&quot;67&quot;</span></a>
+<a class="sourceLine" id="cb14-4" title="4"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Choose <strong>Test</strong>. In the <strong>Response Body</strong> section, you should see a response similar to the following example:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb15-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb15-2" title="2">  <span class="dt">&quot;Response&quot;</span><span class="fu">:</span> <span class="st">&quot;Data Uploaded&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb15-3" title="3">  <span class="dt">&quot;sensorID&quot;</span><span class="fu">:</span> <span class="st">&quot;0025&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb15-4" title="4">  <span class="dt">&quot;temperature&quot;</span><span class="fu">:</span> <span class="st">&quot;67&quot;</span></a>
+<a class="sourceLine" id="cb15-5" title="5"><span class="fu">}</span></a></code></pre></div></li>
+</ol>
+<p>This test simulates the POST request that would come in from different IoT sensors.</p>
+<h2 id="task-6-checking-opensearch-service-for-data">Task 6: Checking OpenSearch Service for data</h2>
+<p>In this task, you use the OpenSearch Service domain to search your data from the browser by submitting a GET request.</p>
+<p>You need your OpenSearch Service domain URL, which you noted previously, to replace the FMI.</p>
+<ol type="1">
+<li><p>Open a text editor of your choice, and paste the following text into the editor.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">&lt;FMI&gt;</span>/lambda-s3-index/lambda-type/_search?pretty</a></code></pre></div></li>
+<li><p>Replace the FMI with your OpenSearch Service domain URL.</p>
+<p><strong>Note</strong>: When you replace the FMI with your own value, make sure that you also remove the angle brackets (&lt;&gt;).</p>
+<p>Example:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb17-1" title="1">https://search-water-temp-domain-xxxxxxxxxxxxxxxxxxxxxxxxxx.us-east-1.es.amazonaws.com/lambda-s3-index/lambda-type/_search?pretty</a></code></pre></div></li>
+<li><p>Copy the search URL and in a new browser tab, paste the URL.</p>
+<p>You should be able to see some test index data that’s being returned.</p></li>
+<li><p><em>(Optional)</em> You can run a few more tests in the API Gateway test feature by using different values for <strong>sensorID</strong> and <strong>temperature</strong>.</p>
+<p>For example, you could paste the following example into the <strong>Request Body</strong> box, and then choose <strong>Test</strong>.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb18-1" title="1"><span class="fu">{</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="dt">&quot;sensorID&quot;</span> <span class="fu">:</span> <span class="st">&quot;0026&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="dt">&quot;temperature&quot;</span> <span class="fu">:</span> <span class="st">&quot;70&quot;</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="fu">}</span></a></code></pre></div></li>
+<li><p>Return to the <strong>Amazon S3</strong> console and open your bucket.</p>
+<p>You should see several .json files.</p></li>
+<li><p>Download one of the files and review its contents.</p>
+<p>The file should contain the test data that was sent through the API Gateway endpoint, similar to the following example:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb19-1" title="1"><span class="fu">{</span><span class="dt">&quot;sensorID&quot;</span><span class="fu">:</span> <span class="st">&quot;0026&quot;</span><span class="fu">,</span> <span class="dt">&quot;timestamp&quot;</span><span class="fu">:</span> <span class="st">&quot;20201019153601&quot;</span><span class="fu">,</span> <span class="dt">&quot;temperature&quot;</span><span class="fu">:</span> <span class="st">&quot;70&quot;</span><span class="fu">}</span></a></code></pre></div></li>
+</ol>
+<p>In the real world, your data wouldn’t originate from API Gateway. Instead, it would come from a fleet of sensors and devices. By testing with API Gateway, you can generate a POST request as if it was coming from outside AWS. In a real-world setting, API Gateway would accept the requests from an external device, and then invoke the backend.</p>
+<p>By creating the OpenSearch Service domain, you also now have access to Kibana. You can explore Kibana to view and analyze the data that’s loaded into the OpenSearch Service domain.</p>
+<h2 id="cleaning-up">Cleaning up</h2>
+<p>In this task, you delete the resources that you created for this exercise.</p>
+<ol type="1">
+<li>Delete the IAM role.
+<ul>
+<li>Open the <strong>IAM</strong> console.</li>
+<li>In the navigation pane, choose <strong>Roles</strong>.</li>
+<li>In the <strong>Search</strong> box, enter <code>data-lake-week-2</code>.</li>
+<li>Delete the <strong>data-lake-week-2</strong> role and confirm the deletion.</li>
+</ul></li>
+<li>Delete the OpenSearch Service domain.
+<ul>
+<li>Open the <strong>OpenSearch Service</strong> console.</li>
+<li>Delete <strong>water-temp-domain</strong> and confirm the deletion.</li>
+</ul></li>
+<li>Delete the Amazon S3 bucket.
+<ul>
+<li>Open the <strong>Amazon S3</strong> console.</li>
+<li>Empty and delete the bucket that you created for this exercise, and confirm its deletion.</li>
+</ul></li>
+<li>Delete the Lambda function.
+<ul>
+<li>Open the <strong>AWS Lambda</strong> console.</li>
+<li>Delete <strong>upload-data</strong> and confirm the deletion.</li>
+</ul></li>
+<li>Delete the API Gateway endpoint.
+<ul>
+<li>Open the <strong>API Gateway</strong> console.</li>
+<li>Delete <strong>sensor-data</strong> and confirm the deletion.</li>
+</ul></li>
+</ol>
+<script>
+document.body.innerHTML = document.body.innerHTML.replace(/RELATIVE(.+)RELATIVE/g, function (match, capture) {
+  let tmp = document.createElement("DIV");
+  tmp.innerHTML = capture;
+  return new URL(tmp.textContent || tmp.innerText || "", document.baseURI).href;
+});
+</script>
+</body>
+<footer>
+    <p>© 2022 Amazon Web Services, Inc. or its affiliates. All rights reserved. This work may not be reproduced or redistributed, in whole or in part, without prior written permission from Amazon Web Services, Inc. Commercial copying, lending, or selling is prohibited. Corrections, feedback, or other questions? Contact us at <a href="https://support.aws.amazon.com/#/contacts/aws-training" target="_blank">https://support.aws.amazon.com/#/contacts/aws-training</a>. All trademarks are the property of their owners.</p>
+</footer>
+</html>
